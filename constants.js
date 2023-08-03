@@ -1,4 +1,4 @@
-export const contractAddress = "0xfF4f4cD3D5fcb73Ab2A0f8Fd1C97A886dDe7Cd17";
+export const contractAddress = "0x10a088Ef146c781c8664B8EEed83B275438E3306";
 export const abi = [
   {
     inputs: [
@@ -28,6 +28,25 @@ export const abi = [
     type: "error",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "winner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "lotteryEnd",
+    type: "event",
+  },
+  {
     inputs: [],
     name: "buyTicket",
     outputs: [],
@@ -35,29 +54,23 @@ export const abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "endLottery",
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "changeOwner",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "entrants",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
+    inputs: [],
+    name: "endLottery",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -94,12 +107,12 @@ export const abi = [
   },
   {
     inputs: [],
-    name: "latestWinner",
+    name: "getTotalTickets",
     outputs: [
       {
-        internalType: "address",
+        internalType: "uint256",
         name: "",
-        type: "address",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -113,19 +126,6 @@ export const abi = [
         internalType: "address",
         name: "",
         type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "randomNumber",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",

@@ -11,13 +11,15 @@
 
     <br /><br />
 
+    <p id="winnerDisplay"></p>
+
     <p id="balanceDisplay"></p>
 
     <p id="ticketsOwnedDisplay"></p>
 
-    <br />
+    <p id="totalTicketsDisplay"></p>
 
-    <h3>Buy:</h3>
+    <h3>Buy (each ticket costs 0.02 ETH):</h3>
 
     <input id="ticketForm" />
     <label for="ticketForm"> Ticket(s)</label>
@@ -28,10 +30,23 @@
 
     <p id="buyStatus"></p>
 
-    <h3>Owner Commands:</h3>
+    <h2>Owner Commands:</h2>
 
-    <button id="withdrawButton">Withdraw All</button>
-    <button id="endLotteryButton">End Lottery</button>
+    <button id="withdrawButton" disabled="true">Withdraw All</button>
+    <button id="endLotteryButton" disabled="true">End Lottery</button>
+
+    <p id="ownerCommandStatus"></p>
+
+    <br />
+
+    <h3>Change Owner:</h3>
+    <input id="changeOwnerForm" />
+
+    <br /><br />
+
+    <button id="changeOwnerButton" disabled="true">Change</button>
+
+    <p id="changeOwnerStatus"></p>
 
     <script src="./index.js" type="module"></script>
   </body>
