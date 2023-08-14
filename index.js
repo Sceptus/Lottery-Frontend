@@ -120,6 +120,35 @@ async function endLottery() {
   }
 }
 
+const endLotteryDurationButton = document.getElementById(
+  "endLotteryDurationButton"
+);
+const endLotteryDurationForm = document.getElementById(
+  "endLotteryDurationForm"
+);
+const endLotteryDurationStatus = document.getElementById(
+  "endLotteryDurationStatus"
+);
+endLotteryDurationButton.onclick = endLotteryDuration;
+
+async function endLotteryDuration() {
+  try {
+    disableButtons(true);
+
+    endLotteryDurationStatus.innerHTML = `Lottery requested to last ${endLotteryDurationForm.value} seconds...`;
+    await (
+      await contract.endLotteryIn.send(endLotteryDurationForm.value)
+    ).wait();
+    endLotteryDurationStatus.innerHTML = `Lottery set to last ${endLotteryDurationForm.value} seconds.`;
+
+    disableButtons(false);
+  } catch (error) {
+    console.log(error);
+    endLotteryDurationStatus.innerHTML = "Lottery termination failed!";
+    disableButtons(false);
+  }
+}
+
 const changeOwnerButton = document.getElementById("changeOwnerButton");
 const changeOwnerForm = document.getElementById("changeOwnerForm");
 const changeOwnerStatus = document.getElementById("changeOwnerStatus");
@@ -143,6 +172,10 @@ async function changeOwner() {
 
 const balanceDisplay = document.getElementById("balanceDisplay");
 
+async function updateTimeLeft() {
+  timeLeftDisplay.innerHTML = `Time left in lottery: ${await contract.getTimeLeft()} seconds`;
+}
+
 async function updateBalance() {
   let balance = await ethers.formatEther(await contract.getBalance());
 
@@ -163,6 +196,8 @@ async function updateTotalTickets() {
   totalTicketsDisplay.innerHTML = `Total tickets in lottery: ${await contract.getTotalTickets()}<br /><br />`;
 }
 
+const timeLeftDisplay = document.getElementById("timeLeftDisplay");
+
 async function disableButtons(bool) {
   buyTicketButton.disabled = bool;
   connectButton.disabled = bool;
@@ -171,10 +206,12 @@ async function disableButtons(bool) {
     withdrawButton.disabled = bool;
     endLotteryButton.disabled = bool;
     changeOwnerButton.disabled = bool;
+    endLotteryDurationButton.disabled = bool;
   } else {
     withdrawButton.disabled = true;
     endLotteryButton.disabled = true;
     changeOwnerButton.disabled = true;
+    endLotteryDurationButton.disabled = true;
   }
 }
 
@@ -184,11 +221,37 @@ async function unlockOwnerCommands() {
   changeOwnerButton.disabled = false;
 }
 
+let prevLotteryEnabled;
+let lotteryEnabled;
+let lock;
+
 async function update() {
-  await updateBalance();
-  await updateTicketsOwned();
-  await updateTotalTickets();
-  console.log("Update!");
+  if (contract != null) {
+    updateBalance();
+    updateTicketsOwned();
+    updateTotalTickets();
+
+    lotteryEnabled = await contract.lotteryEnabled();
+
+    if (prevLotteryEnabled == false && lotteryEnabled == true) {
+      buyTicketButton.disabled = false;
+    } else if (lotteryEnabled == true) {
+      updateTimeLeft();
+    } else {
+      buyTicketButton.disabled = true;
+    }
+
+    if (prevLotteryEnabled == true && lotteryEnabled == false && !lock) {
+      console.log("Listening for lottery...");
+      lock = true;
+      await listenForLotteryEnd();
+      lock = false;
+    }
+
+    prevLotteryEnabled = lotteryEnabled;
+
+    console.log("Update!");
+  }
 }
 
 function listenForLotteryEnd() {
@@ -201,3 +264,17 @@ function listenForLotteryEnd() {
     });
   });
 }
+
+function alwaysListenForLotteryEnd() {
+  return new Promise((resolve, reject) => {
+    contract.on("lotteryEnd", (winner, amount) => {
+      console.log("Event heard!");
+      let trueAmount = ethers.formatEther(amount);
+      winnerDisplay.innerHTML = `${winner} just won ${trueAmount} ETH!`;
+      resolve();
+    });
+  });
+}
+
+//CONSTANT UPDATE
+setInterval(update, 1000);
